@@ -1,18 +1,19 @@
 # Use a imagem base do Python
 FROM python:3.10-slim
 
-# Instalar dependências do sistema necessárias
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+# Dependências de sistema (OpenCV / MediaPipe).
+# Em Debian 12+ o pacote libgl1-mesa-glx foi removido — use libgl1.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
     libglib2.0-0 \
-    libstdc++6 \
+    libsm6 \
     libxrender1 \
     libxext6 \
     gcc \
     g++ \
     build-essential \
     ffmpeg \
-    && apt-get clean
+    && rm -rf /var/lib/apt/lists/*
 
 # Defina o diretório de trabalho
 WORKDIR /app
