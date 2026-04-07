@@ -1,0 +1,10 @@
+Flask==3.0.3
+Flask-SocketIO==5.3.3
+Flask-Cors==3.0.10
+gevent==24.2.1
+gevent-websocket==0.10.1
+opencv-python==4.10.0.84
+dnspython==2.2.1
+numpy==1.26.4
+mediapipe==0.10.14
+tensorflow==2.16.1
