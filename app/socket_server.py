@@ -5,13 +5,39 @@ from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
+
+def _cors_origins():
+    """Front local (3000/3001) + extras. Em Render: CORS_ORIGINS=* para qualquer origem."""
+    raw = os.environ.get("CORS_ORIGINS", "").strip()
+    if raw == "*":
+        return "*"
+    base = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+    ]
+    if not raw:
+        return base
+    for part in raw.split(","):
+        p = part.strip()
+        if p and p not in base:
+            base.append(p)
+    return base
+
+
+CORS_ORIGINS = _cors_origins()
+
 app = Flask(__name__)
-CORS(app)
+if CORS_ORIGINS == "*":
+    CORS(app, resources={r"/*": {"origins": "*"}})
+else:
+    CORS(app, origins=CORS_ORIGINS, supports_credentials=False)
 # threading: em Render o gevent costuma combinar mal com Engine.IO polling atrás do proxy.
 # Buffer maior que o default (1MB) para frames base64 no evento image_data.
 socketio = SocketIO(
     app,
-    cors_allowed_origins="*",
+    cors_allowed_origins=CORS_ORIGINS,
     async_mode="threading",
     max_http_buffer_size=10 * 1024 * 1024,
 )
