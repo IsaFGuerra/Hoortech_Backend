@@ -7,7 +7,14 @@ from flask_socketio import SocketIO
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+# threading: em Render o gevent costuma combinar mal com Engine.IO polling atrás do proxy.
+# Buffer maior que o default (1MB) para frames base64 no evento image_data.
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode="threading",
+    max_http_buffer_size=10 * 1024 * 1024,
+)
 
 # Carregamento preguiçoso: Render exige que a porta abra rápido; TF + modelo demoram demais no import.
 _tracker = None
